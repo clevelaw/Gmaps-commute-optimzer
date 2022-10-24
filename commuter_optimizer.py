@@ -6,8 +6,9 @@ from weather_call import *
 import json
 import csv
 
+
 #API KEY
-gmaps = googlemaps.Client(key='AIzaSyA76RjHZJgUN3RU2NPRbYTOHfy39IlvYg8')
+gmaps = googlemaps.Client(key='AAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
 
 #coordinates of addresses for commute
 work = "30.27776141307871, -97.73169690805364"
