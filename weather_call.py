@@ -61,4 +61,3 @@ def weather_test():
     whats_weather = ww.gather_weather()
     ww.show_weather(whats_weather)
 
-weather_test()
