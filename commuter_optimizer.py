@@ -123,35 +123,40 @@ class Commuting:
 data_for_day = []
 start_time = time.time()
 
-while True:
-    # running commute collection API
-    cc = Commuting(work, home)
-    travel_times = cc.commute_time()
-    cc.show_output(travel_times)
-    # cc.show_raw(travel_times)
 
-    # running weather collection API
-    ww = Commute_weather("Austin")
-    whats_weather = ww.gather_weather()
-    ww.show_weather(whats_weather)
 
-    # saving the data for commmute and weather as JSON
-    # format [[{commute}, {weather}], [{commute}, {weather}], ...]
-    data_for_day.append([travel_times, whats_weather])
-    save_file = "test" + str(travel_times["month"]) + "-" + str(travel_times["day"]) + "commutethunder.json"
-    print("saving file")
-    with open(save_file, "w") as write_file:
-        json.dump(data_for_day, write_file)
 
-    # storing the data in a pandas dataframe
-    data = {
-        "to_home": data_for_day[0][0]['to_home'],
-        "to_work": data_for_day[0][0]['to_work']
-    }
-    df = pd.DataFrame(data, index=[data_for_day[0][0]['s_from_midnight']])
+if __name__ == '__main__':
 
-    print("waiting...")
-    #run program every 5 minutes
-    time.sleep(300.0-((time.time() - start_time)%300.0))
+    while True:
+        # running commute collection API
+        cc = Commuting(work, home)
+        travel_times = cc.commute_time()
+        cc.show_output(travel_times)
+        # cc.show_raw(travel_times)
+
+        # running weather collection API
+        ww = Commute_weather("Austin")
+        whats_weather = ww.gather_weather()
+        ww.show_weather(whats_weather)
+
+        # saving the data for commmute and weather as JSON
+        # format [[{commute}, {weather}], [{commute}, {weather}], ...]
+        data_for_day.append([travel_times, whats_weather])
+        save_file = "test" + str(travel_times["month"]) + "-" + str(travel_times["day"]) + "commute.json"
+        print("saving file")
+        with open(save_file, "w") as write_file:
+            json.dump(data_for_day, write_file)
+
+        # storing the data in a pandas dataframe
+        data = {
+            "to_home": data_for_day[0][0]['to_home'],
+            "to_work": data_for_day[0][0]['to_work']
+        }
+        df = pd.DataFrame(data, index=[data_for_day[0][0]['s_from_midnight']])
+
+        print("waiting...")
+        #run program every 5 minutes
+        time.sleep(300.0-((time.time() - start_time)%300.0))
 
 
