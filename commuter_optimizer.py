@@ -40,8 +40,14 @@ class Commuting:
         input - none, locations are passed to the Commuting class
         return - dictionary containing all the commute info
         """
-        work_to_home = gmaps.directions(self._work_add, self._home_add, mode="driving", departure_time=self._now)
-        home_to_work = gmaps.directions(self._home_add, self._work_add, mode="driving", departure_time=self._now)
+        work_to_home = gmaps.directions(self._work_add,
+                                        self._home_add,
+                                        mode="driving",
+                                        departure_time=self._now)
+        home_to_work = gmaps.directions(self._home_add,
+                                        self._work_add,
+                                        mode="driving",
+                                        departure_time=self._now)
 
         # commute time with no traffic in seconds
         wth_no_traffic = work_to_home[0]['legs'][0]['duration']['value']
@@ -102,13 +108,16 @@ class Commuting:
         input - dictionary from the commute_time function
         output - print statements
         """
+        lost_to_work = round((dict["to_work_no_traffic"] - dict["to_work"]) / 60, 3)
+        lost_to_home = round((dict["to_home_no_traffic"] - dict["to_home"])/60, 3)
+
         print("-----------------------------------------------------------------")
         print(f'Date: {dict["month"]}/{dict["day"]}, {dict["day_of"]}')
         print(f'Time: {travel_times["hour"]}:{dict["minute"]}:{dict["second"]}')
         print(f'Commute to work: {dict["to_work"] / 60: .3} minutes')
         print(f'Commute to home: {dict["to_home"] / 60: .3} minutes')
-        print(f'Time lost to traffic to work: {(dict["to_work_no_traffic"] - dict["to_work"])/60: .3} minutes')
-        print(f'Time lost to traffic to home: {(dict["to_home_no_traffic"] - dict["to_home"])/60: .3} minutes')
+        print(f'Time lost to traffic to work: {lost_to_work} minutes')
+        print(f'Time lost to traffic to home: {lost_to_home} minutes')
         print(f'Total day if leaving now: '
               f'{dict["to_work"] / 3600 + dict["to_home"] / 3600 + 8 + 10 / 60: .3} hours')
         print("-----------------------------------------------------------------")
@@ -118,9 +127,8 @@ class Commuting:
         for i in dict.keys():
             print(f"{i}:{dict[i]}")
 
-#list or array
-data_for_day = {}
-start_time = time.time()
+
+
 
 
 def save_to_json(list1, list2):
@@ -140,6 +148,9 @@ def save_to_json(list1, list2):
 
 
 if __name__ == '__main__':
+
+    data_for_day = {}
+    start_time = time.time()
 
     while True:
         # running commute collection API
