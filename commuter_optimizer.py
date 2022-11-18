@@ -4,6 +4,9 @@ import time
 from weather_call import *
 import json
 
+import os.path
+from os import path
+
 import pandas as pd
 
 
@@ -14,9 +17,6 @@ gmaps = googlemaps.Client(key=google_api)
 #coordinates of addresses for commute
 work = "30.27776141307871, -97.73169690805364"
 home = "30.418150227932976, -97.65688514380827"
-
-# north dakota for debugging
-# work = "46.87405322078762, -96.79005193134536"
 
 class Commuting:
     """
@@ -66,13 +66,12 @@ class Commuting:
         warnings_wth = work_to_home[0]['warnings']
         warnings_htw = work_to_home[0]['warnings']
 
-        date_data = datetime.now()
-        day_of = datetime.today().strftime('%A')
 
-        s_from_midnight =(date_data.hour*3600) + (date_data.minute*60) + date_data.second
+        day_of = datetime.today().strftime('%A')
+        s_from_midnight = (self._now.hour * 3600) + (self._now.minute * 60) + self._now.second
 
         #finds the time for eight hours after the commute has been calculated
-        eight_later = date_data.hour + 8
+        eight_later = self._now.hour + 8
         if eight_later > 24:
             eight_later -= 24
 
@@ -83,12 +82,12 @@ class Commuting:
             "to_home_no_traffic": wth_no_traffic,
             "warnings_wth": warnings_wth,
             "warnings_htw": warnings_htw,
-            "year": date_data.year,
-            "month": date_data.month,
-            "day": date_data.day,
-            "hour": date_data.hour,
-            "minute": date_data.minute,
-            "second": date_data.second,
+            "year": self._now.year,
+            "month": self._now.month,
+            "day": self._now.day,
+            "hour": self._now.hour,
+            "minute": self._now.minute,
+            "second": self._now.second,
             "day_of": day_of,
             "eight_later": eight_later,
             "s_from_midnight": s_from_midnight
@@ -119,11 +118,25 @@ class Commuting:
         for i in dict.keys():
             print(f"{i}:{dict[i]}")
 
-
-data_for_day = []
+#list or array
+data_for_day = {}
 start_time = time.time()
 
 
+def save_to_json(list1, list2):
+    data_to_save = [list1, list2]
+    file_name = "fxntest" + str(list1["month"]) + "-" + str(list1["day"]) + "commute.json"
+    if path.exists(file_name) is True:
+        print("appending data to json")
+        with open(file_name, 'r') as openfile:
+            to_change = json.load(openfile)
+            to_change.append(data_to_save)  # data to append here
+            with open(file_name, "w") as outfile:
+                json.dump(to_change, outfile)
+    else:
+        print("make new json")
+        with open(file_name, "w") as outfile:
+            json.dump([data_to_save], outfile)
 
 
 if __name__ == '__main__':
@@ -140,23 +153,33 @@ if __name__ == '__main__':
         whats_weather = ww.gather_weather()
         ww.show_weather(whats_weather)
 
-        # saving the data for commmute and weather as JSON
-        # format [[{commute}, {weather}], [{commute}, {weather}], ...]
-        data_for_day.append([travel_times, whats_weather])
-        save_file = "test" + str(travel_times["month"]) + "-" + str(travel_times["day"]) + "commute.json"
-        print("saving file")
-        with open(save_file, "w") as write_file:
-            json.dump(data_for_day, write_file)
+        print("save to json running")
+        save_to_json(travel_times, whats_weather)
+        print("save to json ran?")
 
+        def hehe():
+            # saving the data for commmute and weather as JSON
+            # format [[{commute}, {weather}], [{commute}, {weather}], ...]
+            data_for_day.append([travel_times, whats_weather])
+            save_file = "test" + str(travel_times["month"]) + "-" + str(travel_times["day"]) + "commute.json"
+            print("saving file")
+            with open(save_file, "w") as write_file:
+                json.dump(data_for_day, write_file)
+
+            print("qqqqqqqqqqqqqqqqqqqqqqqqqqqqq")
+            save_to_json(travel_times, whats_weather)
+            print("mmmmmmmmmmmmmmmmmmmmmmmmmmmmmm")
+
+        def pandas_store():
         # storing the data in a pandas dataframe
-        data = {
-            "to_home": data_for_day[0][0]['to_home'],
-            "to_work": data_for_day[0][0]['to_work']
-        }
-        df = pd.DataFrame(data, index=[data_for_day[0][0]['s_from_midnight']])
+            data = {
+                "to_home": data_for_day[0][0]['to_home'],
+                "to_work": data_for_day[0][0]['to_work']
+            }
+            df = pd.DataFrame(data, index=[data_for_day[0][0]['s_from_midnight']])
 
         print("waiting...")
         #run program every 5 minutes
-        time.sleep(300.0-((time.time() - start_time)%300.0))
-
+        # time.sleep(300.0-((time.time() - start_time)%300.0))
+        time.sleep(10.0-((time.time() - start_time)%10.0))
 
